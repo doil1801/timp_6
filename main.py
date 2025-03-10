@@ -1,32 +1,34 @@
-from random import random
+import qrcode
+from fastapi import FastAPI, Response, BackgroundTasks
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 
-n = 6
+app = FastAPI()
+app.mount("/static", StaticFiles(directory="images"), name="static")
 
-def func1(f1, f2):
-    if (f1 - n)**2/(4*n**2) + (f2 - n)**2/(n**2) <= 1:
-        return True
-    else:
-        return False
-    
-def func2(f1, f2):
-    if n/2 <= f1 <= 3*n:
-        return True
-    else:
-        return False
-    
-def func3(f1, f2):
-    if n/2 <= f2 <= 2*n:
-        return True
-    else:
-        return False
-    
-l_x = []
-l_y = []
-while True:
-    gen_x = 3 + random()*(18 - 3)
-    gen_y = 3 + random()*(12 - 3)
-    if func1(gen_x, gen_y) and func2(gen_x, gen_y) and func3(gen_x, gen_y):
-        l_x.append(gen_x)
-        l_y.append(gen_y)
-        if len(l_x) == 200:
-            break
+
+@app.get("/", response_class=HTMLResponse)
+def read_root():
+    return """
+    <html>
+        <body>
+            <h3>This is a qr-code creator. Go to the /qr_code?link=your_url, where your_url is an url, which you want to code into qr-code
+            </h3>
+        </body>
+    </html>
+    """
+
+@app.get("/qr_code", response_class=HTMLResponse)
+def read_item(link):
+    code = qrcode.make(link)
+    with open('./images/qr.png', 'wb') as qr:
+        code.save(qr)
+    return """
+    <html>
+        <body>
+            <img 
+                src="/static/qr.png"
+            />
+        </body>
+    </html>
+    """
