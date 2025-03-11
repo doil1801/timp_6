@@ -1,34 +1,51 @@
-import qrcode
-from fastapi import FastAPI, Response, BackgroundTasks
+from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
+import hashlib
 
 app = FastAPI()
-app.mount("/static", StaticFiles(directory="images"), name="static")
-
 
 @app.get("/", response_class=HTMLResponse)
 def read_root():
     return """
     <html>
         <body>
-            <h3>This is a qr-code creator. Go to the /qr_code?link=your_url, where your_url is an url, which you want to code into qr-code
+            <h3>Для того, чтобы хэшировать строку введите следующий запрос /hash/algorithm/string,
+                Поддерживаемые алгоритмы: md5, sha1, sha256, sha512.
             </h3>
         </body>
     </html>
     """
 
-@app.get("/qr_code", response_class=HTMLResponse)
-def read_item(link):
-    code = qrcode.make(link)
-    with open('./images/qr.png', 'wb') as qr:
-        code.save(qr)
-    return """
+@app.get("/hash/{algorithm}/{input_string}", response_class=HTMLResponse)
+def read_root(algorithm, input_string):
+    if algorithm == 'md5':
+        result = hashlib.md5(input_string.encode('utf-8'))
+    elif algorithm == 'sha1':
+        result = hashlib.sha1(input_string.encode('utf-8'))
+    elif algorithm == 'sha256':
+        result = hashlib.sha256(input_string.encode('utf-8'))
+    elif algorithm == 'sha512':
+        result = hashlib.sha512(input_string.encode('utf-8'))
+    else:
+        return """
+        <html>
+            <body>
+                <h3>Неподдерживаемый вид хэширования</h3>
+            </body>
+        </html>
+        """
+    return f"""
     <html>
         <body>
-            <img 
-                src="/static/qr.png"
-            />
+            <h3>
+            Исходная строка: {input_string}
+            </h3>
+            <h3>
+            Вид хэширования: {algorithm}
+            </h3>
+            <h3>
+            Ваш результат: {result.hexdigest()}
+            </h3>
         </body>
     </html>
     """
