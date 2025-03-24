@@ -4,6 +4,7 @@ from database import metadata
 users = Table(
     "users", metadata,
     Column("id", Integer, primary_key=True),
+    Column("wage", Integer),
     Column("name", String(50)),
     Column("email", String(50), unique=True)
 )

@@ -3,7 +3,7 @@ from models import users
 from schemas import UserCreate
 
 async def create_user(user: UserCreate):
-    query = users.insert().values(name=user.name, email=user.email)
+    query = users.insert().values(name=user.name, email=user.email, wage=user.wage)
     return await database.execute(query)
 
 async def get_users():
