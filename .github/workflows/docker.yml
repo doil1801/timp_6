@@ -5,8 +5,8 @@ on:
 
 env:
   IMAGE_NAME: fastapi-app
-  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_NAME }}
-  DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_KEY }}
+  DOCKERHUB_USERNAME: ${{ secrets.DOCKER_NAME }}
+  DOCKERHUB_TOKEN: ${{ secrets.DOCKER_KEY }}
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
